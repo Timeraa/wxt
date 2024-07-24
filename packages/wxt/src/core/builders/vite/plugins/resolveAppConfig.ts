@@ -1,7 +1,7 @@
 import { exists } from 'fs-extra';
 import { resolve } from 'node:path';
 import type * as vite from 'vite';
-import { ResolvedConfig } from '~/types';
+import { ResolvedConfig } from '../../../../types';
 
 /**
  * When importing `virtual:app-config`, resolve it to the `app.config.ts` file in the project.
@@ -13,6 +13,15 @@ export function resolveAppConfig(config: ResolvedConfig): vite.Plugin {
 
   return {
     name: 'wxt:resolve-app-config',
+    config() {
+      return {
+        optimizeDeps: {
+          // Prevent ESBuild from attempting to resolve the virtual module
+          // while optimizing WXT.
+          exclude: [virtualModuleId],
+        },
+      };
+    },
     async resolveId(id) {
       if (id !== virtualModuleId) return;
 
